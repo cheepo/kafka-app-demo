@@ -63,7 +63,7 @@ spec:
        stage ('build') {
          steps {
                 container('maven') {
-                    sh 'mvn clean install'
+                    sh 'mvn clean compile test-compile'
                 }
          }
       }
