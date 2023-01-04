@@ -60,10 +60,24 @@ spec:
         skipDefaultCheckout true
     }
     stages {
+        stage ('checkout') {
+            steps {
+                script {
+                    def repo = checkout scm
+                    revision = sh(script: 'git log -1 --format=\'%h.%ad\' --date=format:%Y%m%d-%H%M | cat', returnStdout: true).trim()
+                    branch = repo.GIT_BRANCH.take(20).replaceAll('/', '_')
+                    if (branch != 'main') {
+                        revision += "-${branch}"
+                    }
+                    sh "echo 'Building revision: ${revision}'"
+                }
+            }
+
+        }
        stage ('build') {
          steps {
                 container('maven') {
-                    sh 'mvn -f /nfs_kube/jenkins-jenkins-build-pvc-a7155d62-c996-404f-a5f7-848b1a71e3ef/repository/kafka-app-demo/kafka-load-producer/pom.xml clean install'
+                    sh 'mvn clean install'
                 }
          }
       }
