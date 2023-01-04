@@ -4,7 +4,7 @@ pipeline {
         kubernetes {
             label 'build-service-pod'
             defaultContainer 'jnlp'
-            yaml "builder.yaml"
+            yaml 'builder.yaml'
         }
     }
     options {
