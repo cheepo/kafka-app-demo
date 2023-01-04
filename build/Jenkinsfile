@@ -1,0 +1,22 @@
+pipeline {
+
+    agent {
+        kubernetes {
+            label 'build-service-pod'
+            defaultContainer 'jnlp'
+            yaml "builder.yaml"
+        }
+    }
+    options {
+        skipDefaultCheckout true
+    }
+    stages {
+       stage ('build') {
+         steps {
+                container('maven') {
+                    sh 'mvn clean install'
+                }
+         }
+      }
+    }
+}
