@@ -19,56 +19,7 @@ pipeline {
         kubernetes {
             label 'build-service-pod'
             defaultContainer 'jnlp'
-            yaml """
-apiVersion: v1
-kind: Pod
-metadata:
-  name: build-service-pod
-spec:
-  containers:
-    - name: kaniko
-      image: gcr.io/kaniko-project/executor:debug
-      command:
-        - /busybox/cat
-      tty: true
-      volumeMounts:
-        - name: kaniko-secret
-          mountPath: /kaniko/.docker
-        - name: kaniko-workspace
-          mountPath: /kaniko/workspace
-          readOnly: false
-    - name: git
-      image: alpine/git:2.36.2
-      command: ["cat"]
-      tty: true
-      volumeMounts:
-        - name: kaniko-workspace
-          mountPath: /kaniko/workspace
-          readOnly: false
-    - name: maven
-      image: maven:3.8.6-eclipse-temurin-17
-      command: ["cat"]
-      tty: true
-      volumeMounts:
-        - name: kaniko-workspace
-          mountPath: /root/.m2
-          readOnly: false
-  dnsPolicy: ClusterFirst
-  dnsConfig:
-    options:
-      - name: ndots
-        value: "1"
-  volumes:
-    - name: kaniko-secret
-      secret:
-        secretName: regcred
-        items:
-          - key: .dockerconfigjson
-            path: config.json
-    - name: kaniko-workspace
-      persistentVolumeClaim:
-        claimName: jenkins-build
-"""
+            yamlFile 'builder.yaml'
         }
     }
     options {
@@ -79,6 +30,14 @@ spec:
          WORKSPACEDIR = '/kaniko/workspace'
         }
     stages {
+       stage('checkout') {
+         steps {
+             if (${TAG_NAME}='') {
+             autoCancelled = true
+             error('No tag name. Aborting')
+           }
+         }
+       }
        stage ('pull')  {
          steps {
              container('git') {  
@@ -93,8 +52,8 @@ spec:
                     sh 'mvn clean install -DskipTests -f /root/.m2/kafka-app-demo/${CHART_NAME}/pom.xml'
                 }
          }
-      }
-            stage ('Build&Push with Kaniko') {
+       }
+       stage ('Build&Push with Kaniko') {
                     steps {
                             container('kaniko') {
                                     sh '/kaniko/executor --dockerfile=${WORKDIR}/build/Dockerfile_${CHART_NAME} \
@@ -103,6 +62,6 @@ spec:
                                     --destination=cheepo/${CHART_NAME}:${IMAGE_TAG}'
                             }
                     }
-            }
+       }
     }
 }
