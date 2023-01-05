@@ -74,12 +74,16 @@ spec:
     options {
         skipDefaultCheckout true
     }
+    environment {
+         WORKDIR = '/kaniko/workspace/kafka-app-demo'
+         WORKSPACEDIR = '/kaniko/workspace'
+        }
     stages {
        stage ('pull')  {
          steps {
              container('git') {  
-                 sh 'git -C /kaniko/workspace/kafka-app-demo stash'
-                 sh 'git -C /kaniko/workspace/kafka-app-demo pull https://github.com/cheepo/kafka-app-demo.git'
+                     sh 'git -C ${WORKDIR} stash'
+                     sh 'git -C ${WORKDIR} pull https://github.com/cheepo/kafka-app-demo.git'
              }
          }
        }
@@ -90,5 +94,15 @@ spec:
                 }
          }
       }
+            stage ('Build&Push with Kaniko') {
+                    steps {
+                            container('kaniko') {
+                                    sh '/kaniko/executor --dockerfile=${WORKDIR}/build/Dockerfile_${CHART_NAME} \
+                                    --context ${WORKSPACEDIR} \
+                                    --force \
+                                    --destination=cheepo/${CHART_NAME}:${IMAGE_TAG}'
+                            }
+                    }
+            }
     }
 }
