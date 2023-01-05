@@ -1,3 +1,18 @@
+properties([
+        parameters(
+                [
+                        choiceParam(
+                                name: 'CHART_NAME',
+                                choices: ['kafka-load-consumer','kafka-load-producer']
+                        ),
+                        stringParam(
+                                name: 'IMAGE_TAG',
+                                defaultValue: ''
+                        )
+                ]
+        )
+])
+
 pipeline {
 
     agent {
@@ -71,7 +86,7 @@ spec:
        stage ('build') {
          steps {
                 container('maven') {
-                    sh 'mvn clean install'
+                    sh 'mvn clean install -f /kaniko/workspace/kafka-app-demo/${CHART_NAME}/pom.xml'
                 }
          }
       }
