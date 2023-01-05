@@ -32,9 +32,9 @@ pipeline {
     stages {
        stage('checkout') {
          steps {
-             if (${TAG_NAME}='') {
+             if (${IMAGE_TAG}='') {
              autoCancelled = true
-             error('No tag name. Aborting')
+             error('No image tag. Aborting')
            }
          }
        }
