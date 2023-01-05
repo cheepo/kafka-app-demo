@@ -32,9 +32,11 @@ pipeline {
     stages {
        stage('checkout') {
          steps {
-             if ${IMAGE_TAG} = '' {
-             autoCancelled = true
-             error('No image tag. Aborting')
+           script {
+             if (params.IMAGE_TAG.isEmpty()) { 
+               currentBuild.result = 'ABORTED'
+               error("IMAGE_TAG is empty")
+             }
            }
          }
        }
