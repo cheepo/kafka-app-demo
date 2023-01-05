@@ -19,7 +19,7 @@ pipeline {
         kubernetes {
             label 'build-service-pod'
             defaultContainer 'jnlp'
-            yamlFile '/kafka-app-demo/build/builder.yaml'
+            yamlFile 'build/builder.yaml'
         }
     }
     options {
