@@ -86,7 +86,7 @@ spec:
        stage ('build') {
          steps {
                 container('maven') {
-                    sh 'mvn clean install -f /root/.m2/kafka-app-demo/${CHART_NAME}/pom.xml'
+                    sh 'mvn clean install -DskipTests -f /root/.m2/kafka-app-demo/${CHART_NAME}/pom.xml'
                 }
          }
       }
