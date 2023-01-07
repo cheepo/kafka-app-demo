@@ -1,0 +1,60 @@
+properties([
+        parameters(
+                [
+                        choiceParam(
+                                name: 'CHART_NAME',
+                                choices: ['kafka-load-consumer','kafka-load-producer']
+                        ),
+                        stringParam(
+                                name: 'IMAGE_TAG',
+                                defaultValue: ''
+                        )
+                ]
+        )
+])
+
+pipeline {
+
+    agent {
+        kubernetes {
+            label 'deploy-service-pod'
+            defaultContainer 'jnlp'
+            yamlFile 'deploy/deploy.yaml'
+        }
+    }
+    options {
+        skipDefaultCheckout true
+    }
+    environment {
+         WORKDIR = '/kaniko/workspace/kafka-app-demo'
+         WORKSPACEDIR = '/kaniko/workspace'
+        }
+    stages {
+       stage('checkout') {
+         steps {
+           script {
+             if (params.IMAGE_TAG.isEmpty()) { 
+               currentBuild.result = 'ABORTED'
+               error("IMAGE_TAG is empty")
+             }
+           }
+         }
+       }
+       stage ('pull')  {
+         steps {
+             container('git') {  
+                     sh 'git -C ${WORKDIR} stash'
+                     sh 'git -C ${WORKDIR} pull https://github.com/cheepo/kafka-app-demo.git'
+             }
+         }
+       }
+       stage ('deploy') {
+         steps {
+                container('helm-cli') {
+                  sh 'helm repo add ${CHART_NAME} cheepo/${CHART_NAME}:${IMAGE_TAG}'
+                  sh 'helm install ${CHART_NAME}/${CHART_NAME}'
+                }
+         }
+       }
+    }
+}
