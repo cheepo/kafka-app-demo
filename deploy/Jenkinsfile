@@ -52,7 +52,7 @@ pipeline {
          steps {
                 container('helm-cli') {
                         sh 'helm create ${WORKDIR}/${CHART_NAME}_${IMAGE_TAG}'
-                        sh 'cp ${WORKDIR}/values.yaml ${WORKDIR}/${CHART_NAME}_${IMAGE_TAG}/values.yaml'
+                        sh 'cp ${WORKDIR}/values_${CHART_NAME}.yaml ${WORKDIR}/${CHART_NAME}_${IMAGE_TAG}/values.yaml'
                         sh 'helm install ${CHART_NAME}_${IMAGE_TAG} cheepo/${CHART_NAME}'
                 }
          }
