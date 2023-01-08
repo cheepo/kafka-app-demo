@@ -51,7 +51,7 @@ pipeline {
        stage ('deploy') {
          steps {
                 container('helm-cli') {
-                        sh 'helm install ${CHART_NAME} ${WORKDIR}/deploy/helm/${CHART_NAME}'
+                        sh 'helm install ${CHART_NAME} ${WORKDIR}/deploy/helm/${CHART_NAME} --create-namespace --namespace my-app'
                 }
          }
        }
