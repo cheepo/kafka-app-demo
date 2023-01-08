@@ -53,7 +53,7 @@ pipeline {
                 container('helm-cli') {
                         sh 'helm create ${WORKDIR}/${CHART_NAME}_${IMAGE_TAG}'
                         sh 'cp ${WORKDIR}/values_${CHART_NAME}.yaml ${WORKDIR}/${CHART_NAME}_${IMAGE_TAG}/values.yaml'
-                        sh 'helm install ${CHART_NAME}_${IMAGE_TAG} ${CHART_NAME}_${IMAGE_TAG}/${CHART_NAME}:${IMAGE_TAG}'
+                        sh 'helm install ${WORKDIR}/${CHART_NAME}_${IMAGE_TAG} ${CHART_NAME}_${IMAGE_TAG}/${CHART_NAME}:${IMAGE_TAG}'
                 }
          }
        }
