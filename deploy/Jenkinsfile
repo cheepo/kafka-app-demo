@@ -51,8 +51,7 @@ pipeline {
        stage ('deploy') {
          steps {
                 container('helm-cli') {
-                        sh 'helm repo add ${CHART_NAME} https://github.com/cheepo/kafka-app-demo/tree/main/deploy/helm/${CHART_NAME}'
-                        sh 'helm install ${CHART_NAME} ${CHART_NAME}/${CHART_NAME}'
+                        sh 'helm install ${CHART_NAME} ${WORKDIR}/deploy/helm/${CHART_NAME}'
                 }
          }
        }
