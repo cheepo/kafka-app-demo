@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: cheepo/kafka-load-consumer
+  repository: cheepo/kafka-load-producer
   pullPolicy: IfNotPresent
   tag: "0.1"
 
