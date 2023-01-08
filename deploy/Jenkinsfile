@@ -51,8 +51,9 @@ pipeline {
        stage ('deploy') {
          steps {
                 container('helm-cli') {
-                  sh 'helm repo add ${CHART_NAME} https://hub.docker.com/repository/docker/cheepo/${CHART_NAME}'
-                  sh 'helm install ${CHART_NAME}/${CHART_NAME}:${IMAGE_TAG}'
+                        sh 'helm create ${WORKDIR}/${CHART_NAME}_${IMAGE_TAG}'
+                        sh 'cp ${WORKDIR}/values.yaml ${WORKDIR}/${CHART_NAME}_${IMAGE_TAG}/values.yaml'
+                        sh 'helm install ${CHART_NAME}_${IMAGE_TAG} cheepo/${CHART_NAME}'
                 }
          }
        }
