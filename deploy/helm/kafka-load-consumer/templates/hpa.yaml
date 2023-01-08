@@ -2,14 +2,14 @@
 apiVersion: autoscaling/v2beta1
 kind: HorizontalPodAutoscaler
 metadata:
-  name: {{ include "kafka-load-consumer_0.1.fullname" . }}
+  name: {{ include "kafka-load-consumer.fullname" . }}
   labels:
-    {{- include "kafka-load-consumer_0.1.labels" . | nindent 4 }}
+    {{- include "kafka-load-consumer.labels" . | nindent 4 }}
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: {{ include "kafka-load-consumer_0.1.fullname" . }}
+    name: {{ include "kafka-load-consumer.fullname" . }}
   minReplicas: {{ .Values.autoscaling.minReplicas }}
   maxReplicas: {{ .Values.autoscaling.maxReplicas }}
   metrics:
