@@ -57,14 +57,14 @@ pipeline {
        stage ('Docker Build') { 
                     steps { 
                             script { 
-                                   dockerImage = docker.build registry +${IMAGE_TAG} 
+                                    dockerImage = docker.build("cheepo/${CHART_NAME}:${IMAGE_TAG}")
                             } 
                     } 
        } 
        stage ('Docker Push') { 
                     steps { 
                             script { 
-                                    docker.withRegistry( "" ) { 
+                                    docker.withRegistry( 'https://hub.docker.com', 'DockerHubCredentials' ) { 
             			              dockerImage.push() 
                                    } 
                             } 
