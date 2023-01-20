@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: build-deploy-service-pod
+spec:
+  containers:
+    - name: kaniko
+      image: gcr.io/kaniko-project/executor:debug
+      command:
+        - /busybox/cat
+      tty: true
+      volumeMounts:
+        - name: kaniko-secret
+          mountPath: /kaniko/.docker
+        - name: kaniko-workspace
+          mountPath: /kaniko/workspace
+          readOnly: false
+    - name: git
+      image: alpine/git:2.36.2
+      command: ["cat"]
+      tty: true
+      volumeMounts:
+        - name: kaniko-workspace
+          mountPath: /kaniko/workspace
+          readOnly: false
+    - name: maven
+      image: maven:3.8.6-eclipse-temurin-17
+      command: ["cat"]
+      tty: true
+      volumeMounts:
+        - name: kaniko-workspace
+          mountPath: /root/.m2
+          readOnly: false
+    - name: git
+      image: alpine/git
+      command: ["cat"]
+      tty: true
+      volumeMounts:
+        - name: kaniko-workspace
+          mountPath: /kaniko/workspace
+          readOnly: false
+    - name: helm-cli
+      image: lachlanevenson/k8s-helm
+      command: ["cat"]
+      tty: true
+      volumeMounts:
+        - name: kaniko-workspace
+          mountPath: /kaniko/workspace
+  dnsPolicy: ClusterFirst
+  dnsConfig:
+    options:
+      - name: ndots
+        value: "1"
+  volumes:
+    - name: kaniko-secret
+      secret:
+        secretName: regcred
+        items:
+          - key: .dockerconfigjson
+            path: config.json
+    - name: kaniko-workspace
+      persistentVolumeClaim:
+        claimName: jenkins-build
