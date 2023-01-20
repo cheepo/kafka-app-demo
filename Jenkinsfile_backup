@@ -57,7 +57,7 @@ pipeline {
        stage ('Docker Build') { 
                     steps { 
                             script { 
-                                    dockerImage = docker.build("cheepo/${CHART_NAME}:${IMAGE_TAG}")
+                                    dockerImage = docker.build("cheepo")
                             } 
                     } 
        } 
