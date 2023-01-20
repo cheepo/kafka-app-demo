@@ -31,14 +31,6 @@ spec:
         - name: kaniko-workspace
           mountPath: /root/.m2
           readOnly: false
-    - name: git
-      image: alpine/git
-      command: ["cat"]
-      tty: true
-      volumeMounts:
-        - name: kaniko-workspace
-          mountPath: /kaniko/workspace
-          readOnly: false
     - name: helm-cli
       image: lachlanevenson/k8s-helm
       command: ["cat"]
