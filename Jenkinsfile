@@ -30,7 +30,7 @@ spec:
         git 'https://github.com/cheepo/kafka-app-demo'
         container(name: 'kaniko') {
             sh '''
-            /kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --destination=cheepo/sample-microservice:latest --destination=cheepo/sample-microservice:v$BUILD_NUMBER
+            /kaniko/executor --dockerfile `pwd`/Dockerfile --context `pwd` --force --destination=cheepo/sample-microservice:latest --destination=cheepo/sample-microservice:v$BUILD_NUMBER
             '''
         }
       }
