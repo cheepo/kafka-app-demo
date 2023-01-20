@@ -19,8 +19,8 @@ spec:
         mountPath: /home/user/.docker
   volumes:
     - name: docker-config
-      configMap:
-        name: docker-config
+      persistentVolumeClaim:
+        claimName: jenkins-build
 """
     }
   }
