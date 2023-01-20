@@ -1,0 +1,82 @@
+properties([ 
+        parameters( 
+                [ 
+                        choiceParam( 
+                                name: 'CHART_NAME', 
+                                choices: ['kafka-load-consumer','kafka-load-producer'] 
+                        ), 
+                        stringParam( 
+                                name: 'IMAGE_TAG', 
+                                defaultValue: '' 
+                        ) 
+                ] 
+        ) 
+]) 
+
+pipeline { 
+    agent { 
+        kubernetes { 
+            label 'build-deploy-service-pod' 
+            defaultContainer 'jnlp' 
+            yamlFile 'build_deploy.yaml' 
+        } 
+    } 
+    options { 
+        skipDefaultCheckout true 
+    } 
+    environment { 
+         WORKAPPDIR = '/kaniko/workspace/kafka-app-demo' 
+         WORKDIR = '/kaniko/workspace' 
+        } 
+    stages { 
+       stage('Checkout') { 
+         steps { 
+           script { 
+             if (params.IMAGE_TAG.isEmpty()) {  
+               currentBuild.result = 'ABORTED' 
+               error("IMAGE_TAG is empty") 
+             } 
+           } 
+         } 
+       } 
+       stage ('Pull')  { 
+         steps { 
+             container('git') {   
+                     sh 'git -C ${WORKAPPDIR} stash' 
+                     sh 'git -C ${WORKAPPDIR} pull https://github.com/cheepo/kafka-app-demo.git' 
+             } 
+         } 
+       } 
+       stage ('Maven build') { 
+         steps { 
+                container('maven') { 
+                    sh 'mvn clean install -DskipTests -f /root/.m2/kafka-app-demo/${CHART_NAME}/pom.xml' 
+                } 
+         } 
+       } 
+       stage ('Docker Build') { 
+                    steps { 
+                            script { 
+                                   dockerImage = docker.build registry +${IMAGE_TAG} 
+                            } 
+                    } 
+       } 
+       stage ('Docker Push') { 
+                    steps { 
+                            script { 
+                                    docker.withRegistry( "" ) { 
+            			              dockerImage.push() 
+                                   } 
+                            } 
+                    } 
+       } 
+
+   //    stage('Deploy App') { 
+//      	  steps { 
+ //     		  script { 
+//         			 kubernetesDeploy(configs: "myweb.yaml", kubeconfigId: "mykubeconfig") 
+ //       		} 
+ //   	  } 
+//      } 
+    } 
+} 
