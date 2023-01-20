@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: build-deploy-service-pod
+  name: build-service-pod
 spec:
   containers:
     - name: kaniko
@@ -31,13 +31,6 @@ spec:
         - name: kaniko-workspace
           mountPath: /root/.m2
           readOnly: false
-    - name: helm-cli
-      image: lachlanevenson/k8s-helm
-      command: ["cat"]
-      tty: true
-      volumeMounts:
-        - name: kaniko-workspace
-          mountPath: /kaniko/workspace
   dnsPolicy: ClusterFirst
   dnsConfig:
     options:
